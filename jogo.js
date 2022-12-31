@@ -1,5 +1,6 @@
 console.log("Mavi Bird");
 
+let frames = 0;
 const somDeBatida = new Audio();
 somDeBatida.src = './efeitos/hit.wav'
 
@@ -46,39 +47,41 @@ const planoDeFundo = {
   },
 };
 
-const chao = {
-  spriteX: 0,
-  spriteY: 610,
-  largura: 224,
-  altura: 112,
-  x: 0,
-  y: canvas.height - 112,
-  desenhar() {
-    context.drawImage(
-      sprites,
-      chao.spriteX,
-      chao.spriteY,
-      chao.largura,
-      chao.altura,
-      chao.x,
-      chao.y,
-      chao.largura,
-      chao.altura
-    );
+function criaChao() {
+  const chao = {
+    spriteX: 0,
+    spriteY: 610,
+    largura: 224,
+    altura: 112,
+    x: 0,
+    y: canvas.height - 112,
+    atualiza() {
+      const movimentoDoChao = 1;
+      const repeteEm = chao.largura / 2;
+      const movimentacao = chao.x - movimentoDoChao;
 
-    context.drawImage(
-      sprites,
-      chao.spriteX,
-      chao.spriteY,
-      chao.largura,
-      chao.altura,
-      chao.x + chao.largura,
-      chao.y,
-      chao.largura,
-      chao.altura
-    );
-  },
-};
+      chao.x = movimentacao % repeteEm;
+    },
+    desenhar() {
+      context.drawImage(
+        sprites,
+        chao.spriteX, chao.spriteY,
+        chao.largura, chao.altura,
+        chao.x, chao.y,
+        chao.largura, chao.altura,
+      );
+
+      context.drawImage(
+        sprites,
+        chao.spriteX, chao.spriteY,
+        chao.largura, chao.altura,
+        (chao.x + chao.largura), chao.y,
+        chao.largura, chao.altura,
+      );
+    },
+  };
+  return chao;
+}
 
 function fazColisao(maviBird, chao){
     const maviBirdY = maviBird.y + maviBird.altura;
@@ -100,41 +103,62 @@ function criaMaviBird() {
     x: 10,
     y: 50,
     pulo: 4.6,
-    pula(){
-      maviBird.velocidade = - maviBird.pulo;
-    } ,
+    pula() {
+      console.log('devo pular');
+      console.log('[antes]', maviBird.velocidade);
+      maviBird.velocidade =  - maviBird.pulo;
+      console.log('[depois]', maviBird.velocidade);
+    },
     gravidade: 0.25,
     velocidade: 0,
     atualiza() {
-      if(fazColisao(maviBird, chao)) {
-        console.log("Fez Colisao");
-        somDeBatida.play();
+      if(fazColisao(maviBird, globais.chao)) {
+        console.log('Fez colisao');
+        som_HIT.play();
 
         setTimeout(() => {
-          mudaParaTela(telas.inicio);
+          mudaParaTela(Telas.INICIO);
         }, 500);
-
         return;
       }
   
-      maviBird.velocidade += maviBird.gravidade;
+      maviBird.velocidade = maviBird.velocidade + maviBird.gravidade;
       maviBird.y = maviBird.y + maviBird.velocidade;
     },
+    movimentos: [
+      { spriteX: 0, spriteY: 0, }, 
+      { spriteX: 0, spriteY: 26, },  
+      { spriteX: 0, spriteY: 52, }, 
+      { spriteX: 0, spriteY: 26, }, 
+    ],
+    frameAtual: 0,
+    atualizaOFrameAtual() {     
+      const intervaloDeFrames = 10;
+      const passouOIntervalo = frames % intervaloDeFrames === 0;
+      console.log('passouOIntervalo', passouOIntervalo)
+
+      if(passouOIntervalo) {
+        const baseDoIncremento = 1;
+        const incremento = baseDoIncremento + maviBird.frameAtual;
+        const baseRepeticao = maviBird.movimentos.length;
+        maviBird.frameAtual = incremento % baseRepeticao
+      }
+
+    },
     desenhar() {
+      maviBird.atualizaOFrameAtual();
+      const { spriteX, spriteY } = maviBird.movimentos[maviBird.frameAtual];
+
       context.drawImage(
         sprites,
-        maviBird.spriteX,
-        maviBird.spriteY,
-        maviBird.largura,
-        maviBird.altura,
-        maviBird.x,
-        maviBird.y,
-        maviBird.largura,
-        maviBird.altura
+        spriteX, spriteY, 
+        maviBird.largura, maviBird.altura, 
+        maviBird.x, maviBird.y,
+        maviBird.largura, maviBird.altura,
       );
-    },
+    }
   }
-  return maviBird;
+  return maviBird;  
 }
 
 const maviBird = {
@@ -212,10 +236,11 @@ const telas = {
   inicio: {
     inicializa(){
       globais.maviBird = criaMaviBird();
+      globais.chao = criaChao();
     },
     desenhar() {
       planoDeFundo.desenhar();
-      chao.desenhar();
+      globais.chao.desenhar();
       globais.maviBird.desenhar();
       mensagemGetReady.desenhar();
     },
@@ -223,7 +248,7 @@ const telas = {
       mudaParaTela(telas.jogo);
     },
     atualiza() {
-
+      globais.chao.atualiza();
     }
   },
 };
@@ -231,7 +256,7 @@ const telas = {
 telas.jogo = {
     desenhar() {
       planoDeFundo.desenhar();
-      chao.desenhar();
+      globais.chao.desenhar();
       globais.maviBird.desenhar();
     },
     click(){
@@ -247,6 +272,7 @@ function loop() {
   telaAtiva.desenhar();
   telaAtiva.atualiza();
 
+  frames += 1; 
   requestAnimationFrame(loop);
 }
 
