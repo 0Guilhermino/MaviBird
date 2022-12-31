@@ -1,10 +1,10 @@
-console.log('[DevSoutinho] Flappy Bird');
+console.log("[DevSoutinho] Flappy Bird");
 
 const sprites = new Image();
-sprites.src = './sprites_mv.png';
+sprites.src = "./sprites_mv.png";
 
-const canvas = document.querySelector('canvas');
-const contexto = canvas.getContext('2d');
+const canvas = document.querySelector("canvas");
+const context = canvas.getContext("2d");
 
 const planoDeFundo = {
   spriteX: 390,
@@ -14,23 +14,31 @@ const planoDeFundo = {
   x: 0,
   y: canvas.height - 204,
   desenhar() {
-    contexto.fillStyle = '#70c5ce';
-    contexto.fillRect(0,0, canvas.width, canvas.height)
+    context.fillStyle = "#70c5ce";
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
-    contexto.drawImage(
+    context.drawImage(
       sprites,
-      planoDeFundo.spriteX, planoDeFundo.spriteY,
-      planoDeFundo.largura, planoDeFundo.altura,
-      planoDeFundo.x, planoDeFundo.y,
-      planoDeFundo.largura, planoDeFundo.altura,
+      planoDeFundo.spriteX,
+      planoDeFundo.spriteY,
+      planoDeFundo.largura,
+      planoDeFundo.altura,
+      planoDeFundo.x,
+      planoDeFundo.y,
+      planoDeFundo.largura,
+      planoDeFundo.altura
     );
 
-    contexto.drawImage(
+    context.drawImage(
       sprites,
-      planoDeFundo.spriteX, planoDeFundo.spriteY,
-      planoDeFundo.largura, planoDeFundo.altura,
-      (planoDeFundo.x + planoDeFundo.largura), planoDeFundo.y,
-      planoDeFundo.largura, planoDeFundo.altura,
+      planoDeFundo.spriteX,
+      planoDeFundo.spriteY,
+      planoDeFundo.largura,
+      planoDeFundo.altura,
+      planoDeFundo.x + planoDeFundo.largura,
+      planoDeFundo.y,
+      planoDeFundo.largura,
+      planoDeFundo.altura
     );
   },
 };
@@ -43,61 +51,124 @@ const chao = {
   x: 0,
   y: canvas.height - 112,
   desenhar() {
-    contexto.drawImage(
+    context.drawImage(
       sprites,
-      chao.spriteX, chao.spriteY,
-      chao.largura, chao.altura,
-      chao.x, chao.y,
-      chao.largura, chao.altura,
+      chao.spriteX,
+      chao.spriteY,
+      chao.largura,
+      chao.altura,
+      chao.x,
+      chao.y,
+      chao.largura,
+      chao.altura
     );
 
-    contexto.drawImage(
+    context.drawImage(
       sprites,
-      chao.spriteX, chao.spriteY,
-      chao.largura, chao.altura,
-      (chao.x + chao.largura), chao.y,
-      chao.largura, chao.altura,
+      chao.spriteX,
+      chao.spriteY,
+      chao.largura,
+      chao.altura,
+      chao.x + chao.largura,
+      chao.y,
+      chao.largura,
+      chao.altura
     );
   },
 };
 
-  const maviBird = {
-    spriteX: 0,
-    spriteY: 0,
-    largura: 33,
-    altura: 24,
-    x: 10,
-    y: 50,
-    gravidade: 0.25,
-    velocidade: 0,
-    atualiza(){
-      maviBird.velocidade += maviBird.gravidade;
-      maviBird.y = maviBird.y + maviBird.velocidade;
-    },
-    desenhar(){
-      contexto.drawImage(
-        sprites,
-        maviBird.spriteX, maviBird.spriteY,
-        maviBird.largura, maviBird.altura,
-        maviBird.x, maviBird.y,
-        maviBird.largura, maviBird.altura
-      );
-    }
-  }
+const maviBird = {
+  spriteX: 0,
+  spriteY: 0,
+  largura: 33,
+  altura: 24,
+  x: 10,
+  y: 50,
+  gravidade: 0.25,
+  velocidade: 0,
+  atualiza() {
+    maviBird.velocidade += maviBird.gravidade;
+    maviBird.y = maviBird.y + maviBird.velocidade;
+  },
+  desenhar() {
+    context.drawImage(
+      sprites,
+      maviBird.spriteX,
+      maviBird.spriteY,
+      maviBird.largura,
+      maviBird.altura,
+      maviBird.x,
+      maviBird.y,
+      maviBird.largura,
+      maviBird.altura
+    );
+  },
+};
 
-
-    
-  
-    function loop(){
-      maviBird.atualiza();
-
-
+const mensagemGetReady = {
+  sX: 134,
+  sY: 0,
+  w: 174,
+  h: 152,
+  x: canvas.width / 2 - 174 / 2,
+  y: 50,
+  desenhar() {
+    context.drawImage(
+      sprites,
+      mensagemGetReady.sX,
+      mensagemGetReady.sY,
+      mensagemGetReady.w,
+      mensagemGetReady.h,
+      mensagemGetReady.x,
+      mensagemGetReady.y,
+      mensagemGetReady.w,
+      mensagemGetReady.h
+    );
+  },
+};
+let telaAtiva = {};
+function mudaParaTela(novatela){
+  telaAtiva = novatela
+}
+const telas = {
+  inicio: {
+    desenhar() {
       planoDeFundo.desenhar();
       chao.desenhar();
       maviBird.desenhar();
+      mensagemGetReady.desenhar();
+    },
+    click(){
+      mudaParaTela(telas.jogo);
+    },
+    atualiza() {},
+  },
+};
 
-      
-      requestAnimationFrame(loop);
-    }
-    
-    loop();
+telas.jogo = {
+    desenhar() {
+      planoDeFundo.desenhar();
+      chao.desenhar();
+      maviBird.desenhar();
+    },
+    atualiza() {
+      maviBird.atualiza();
+    },
+};
+
+function loop() {
+
+  telaAtiva.desenhar();
+  telaAtiva.atualiza();
+
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener('click', function() {
+  if(telaAtiva.click){
+    telaAtiva.click();
+  }
+})
+
+mudaParaTela(telas.inicio);
+loop();
