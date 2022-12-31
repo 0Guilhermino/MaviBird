@@ -1,4 +1,7 @@
-console.log("[DevSoutinho] Flappy Bird");
+console.log("Mavi Bird");
+
+const somDeBatida = new Audio();
+somDeBatida.src = './efeitos/hit.wav'
 
 const sprites = new Image();
 sprites.src = "./sprites_mv.png";
@@ -77,6 +80,63 @@ const chao = {
   },
 };
 
+function fazColisao(maviBird, chao){
+    const maviBirdY = maviBird.y + maviBird.altura;
+    const chaoY = chao.y;
+
+    if(maviBirdY >= chaoY) {
+      return true;
+    }
+
+    return false;
+}
+
+function criaMaviBird() {
+  const maviBird = {
+    spriteX: 0,
+    spriteY: 0,
+    largura: 33,
+    altura: 24,
+    x: 10,
+    y: 50,
+    pulo: 4.6,
+    pula(){
+      maviBird.velocidade = - maviBird.pulo;
+    } ,
+    gravidade: 0.25,
+    velocidade: 0,
+    atualiza() {
+      if(fazColisao(maviBird, chao)) {
+        console.log("Fez Colisao");
+        somDeBatida.play();
+
+        setTimeout(() => {
+          mudaParaTela(telas.inicio);
+        }, 500);
+
+        return;
+      }
+  
+      maviBird.velocidade += maviBird.gravidade;
+      maviBird.y = maviBird.y + maviBird.velocidade;
+    },
+    desenhar() {
+      context.drawImage(
+        sprites,
+        maviBird.spriteX,
+        maviBird.spriteY,
+        maviBird.largura,
+        maviBird.altura,
+        maviBird.x,
+        maviBird.y,
+        maviBird.largura,
+        maviBird.altura
+      );
+    },
+  }
+  return maviBird;
+}
+
 const maviBird = {
   spriteX: 0,
   spriteY: 0,
@@ -84,9 +144,20 @@ const maviBird = {
   altura: 24,
   x: 10,
   y: 50,
+  pulo: 4.6,
+  pula(){
+    maviBird.velocidade = - maviBird.pulo;
+  } ,
   gravidade: 0.25,
   velocidade: 0,
   atualiza() {
+    if(fazColisao(maviBird, chao)) {
+      console.log("Fez Colisao");
+
+      mudaParaTela(telas.inicio);
+      return;
+    }
+
     maviBird.velocidade += maviBird.gravidade;
     maviBird.y = maviBird.y + maviBird.velocidade;
   },
@@ -126,22 +197,34 @@ const mensagemGetReady = {
     );
   },
 };
+
+const globais = {};
 let telaAtiva = {};
 function mudaParaTela(novatela){
   telaAtiva = novatela
+
+  if(telaAtiva.inicializa) {
+    telaAtiva.inicializa();
+  }
 }
+
 const telas = {
   inicio: {
+    inicializa(){
+      globais.maviBird = criaMaviBird();
+    },
     desenhar() {
       planoDeFundo.desenhar();
       chao.desenhar();
-      maviBird.desenhar();
+      globais.maviBird.desenhar();
       mensagemGetReady.desenhar();
     },
     click(){
       mudaParaTela(telas.jogo);
     },
-    atualiza() {},
+    atualiza() {
+
+    }
   },
 };
 
@@ -149,10 +232,13 @@ telas.jogo = {
     desenhar() {
       planoDeFundo.desenhar();
       chao.desenhar();
-      maviBird.desenhar();
+      globais.maviBird.desenhar();
+    },
+    click(){
+      globais.maviBird.pula();
     },
     atualiza() {
-      maviBird.atualiza();
+      globais.maviBird.atualiza();
     },
 };
 
