@@ -2,7 +2,7 @@ console.log("Mavi Bird");
 
 let frames = 0;
 const somDeBatida = new Audio();
-somDeBatida.src = './efeitos/hit.wav'
+somDeBatida.src = "./efeitos/hit.wav";
 
 const sprites = new Image();
 sprites.src = "./sprites_mv.png";
@@ -65,33 +65,41 @@ function criaChao() {
     desenhar() {
       context.drawImage(
         sprites,
-        chao.spriteX, chao.spriteY,
-        chao.largura, chao.altura,
-        chao.x, chao.y,
-        chao.largura, chao.altura,
+        chao.spriteX,
+        chao.spriteY,
+        chao.largura,
+        chao.altura,
+        chao.x,
+        chao.y,
+        chao.largura,
+        chao.altura
       );
 
       context.drawImage(
         sprites,
-        chao.spriteX, chao.spriteY,
-        chao.largura, chao.altura,
-        (chao.x + chao.largura), chao.y,
-        chao.largura, chao.altura,
+        chao.spriteX,
+        chao.spriteY,
+        chao.largura,
+        chao.altura,
+        chao.x + chao.largura,
+        chao.y,
+        chao.largura,
+        chao.altura
       );
     },
   };
   return chao;
 }
 
-function fazColisao(maviBird, chao){
-    const maviBirdY = maviBird.y + maviBird.altura;
-    const chaoY = chao.y;
+function fazColisao(maviBird, chao) {
+  const maviBirdY = maviBird.y + maviBird.altura;
+  const chaoY = chao.y;
 
-    if(maviBirdY >= chaoY) {
-      return true;
-    }
+  if (maviBirdY >= chaoY) {
+    return true;
+  }
 
-    return false;
+  return false;
 }
 
 function criaMaviBird() {
@@ -104,16 +112,16 @@ function criaMaviBird() {
     y: 50,
     pulo: 4.6,
     pula() {
-      console.log('devo pular');
-      console.log('[antes]', maviBird.velocidade);
-      maviBird.velocidade =  - maviBird.pulo;
-      console.log('[depois]', maviBird.velocidade);
+      console.log("devo pular");
+      console.log("[antes]", maviBird.velocidade);
+      maviBird.velocidade = -maviBird.pulo;
+      console.log("[depois]", maviBird.velocidade);
     },
     gravidade: 0.25,
     velocidade: 0,
     atualiza() {
-      if(fazColisao(maviBird, globais.chao)) {
-        console.log('Fez colisao');
+      if (fazColisao(maviBird, globais.chao)) {
+        console.log("Fez colisao");
         som_HIT.play();
 
         setTimeout(() => {
@@ -121,29 +129,28 @@ function criaMaviBird() {
         }, 500);
         return;
       }
-  
+
       maviBird.velocidade = maviBird.velocidade + maviBird.gravidade;
       maviBird.y = maviBird.y + maviBird.velocidade;
     },
     movimentos: [
-      { spriteX: 0, spriteY: 0, }, 
-      { spriteX: 0, spriteY: 26, },  
-      { spriteX: 0, spriteY: 52, }, 
-      { spriteX: 0, spriteY: 26, }, 
+      { spriteX: 0, spriteY: 0 },
+      { spriteX: 0, spriteY: 26 },
+      { spriteX: 0, spriteY: 52 },
+      { spriteX: 0, spriteY: 26 },
     ],
     frameAtual: 0,
-    atualizaOFrameAtual() {     
+    atualizaOFrameAtual() {
       const intervaloDeFrames = 10;
       const passouOIntervalo = frames % intervaloDeFrames === 0;
-      console.log('passouOIntervalo', passouOIntervalo)
+      //console.log('passouOIntervalo', passouOIntervalo)
 
-      if(passouOIntervalo) {
+      if (passouOIntervalo) {
         const baseDoIncremento = 1;
         const incremento = baseDoIncremento + maviBird.frameAtual;
         const baseRepeticao = maviBird.movimentos.length;
-        maviBird.frameAtual = incremento % baseRepeticao
+        maviBird.frameAtual = incremento % baseRepeticao;
       }
-
     },
     desenhar() {
       maviBird.atualizaOFrameAtual();
@@ -151,14 +158,18 @@ function criaMaviBird() {
 
       context.drawImage(
         sprites,
-        spriteX, spriteY, 
-        maviBird.largura, maviBird.altura, 
-        maviBird.x, maviBird.y,
-        maviBird.largura, maviBird.altura,
+        spriteX,
+        spriteY,
+        maviBird.largura,
+        maviBird.altura,
+        maviBird.x,
+        maviBird.y,
+        maviBird.largura,
+        maviBird.altura
       );
-    }
-  }
-  return maviBird;  
+    },
+  };
+  return maviBird;
 }
 
 const maviBird = {
@@ -169,13 +180,13 @@ const maviBird = {
   x: 10,
   y: 50,
   pulo: 4.6,
-  pula(){
-    maviBird.velocidade = - maviBird.pulo;
-  } ,
+  pula() {
+    maviBird.velocidade = -maviBird.pulo;
+  },
   gravidade: 0.25,
   velocidade: 0,
   atualiza() {
-    if(fazColisao(maviBird, chao)) {
+    if (fazColisao(maviBird, chao)) {
       console.log("Fez Colisao");
 
       mudaParaTela(telas.inicio);
@@ -222,65 +233,151 @@ const mensagemGetReady = {
   },
 };
 
+function criaCanos() {
+  const canos = {
+    largura: 52,
+    altura: 400,
+    chao: {
+      spriteX: 0,
+      spriteY: 169,
+    },
+    ceu: {
+      spriteX: 52,
+      spriteY: 169,
+    },
+    espaco: 80,
+    desenhar() {
+      canos.pares.forEach(function (par) {
+        const yRandom = par.y;
+        const espacamentoEntreCanos = 90;
+
+        const canoCeuX = par.x;
+        const canoCeuY = yRandom;
+
+        context.drawImage(
+          sprites,
+          canos.ceu.spriteX,
+          canos.ceu.spriteY,
+          canos.largura,
+          canos.altura,
+          canoCeuX,
+          canoCeuY,
+          canos.largura,
+          canos.altura
+        );
+        const canoChaoX = par.x;
+        const canoChaoY = canos.altura + espacamentoEntreCanos + yRandom;
+        context.drawImage(
+          sprites,
+          canos.chao.spriteX,
+          canos.chao.spriteY,
+          canos.largura,
+          canos.altura,
+          canoChaoX,
+          canoChaoY,
+          canos.largura,
+          canos.altura
+        );
+      });
+    },
+    temColisaoComOMaviBird(par){
+
+      if(globais.maviBird.x >= par.x){
+        
+      }
+
+      return false
+    },
+    pares: [],
+    atualiza() {
+      const passou100Frames = frames % 100 === 0;
+      if (passou100Frames) {
+        console.log("passou 100 frames");
+        canos.pares.push({
+          x: canvas.width,
+          y: -150 * (Math.random() + 1),
+        });
+      }
+
+      canos.pares.forEach(function (par) {
+        par.x = par.x -2;
+
+        if(canos.temColisaoComOMaviBird(par)){
+          console.log('você perdeu');
+        }
+
+        if(par.x + canos.largura<= 0) {
+          canos.pares.shift();
+        }
+      });
+
+
+    },
+  };
+  return canos;
+}
+
 const globais = {};
 let telaAtiva = {};
-function mudaParaTela(novatela){
-  telaAtiva = novatela
+function mudaParaTela(novatela) {
+  telaAtiva = novatela;
 
-  if(telaAtiva.inicializa) {
+  if (telaAtiva.inicializa) {
     telaAtiva.inicializa();
   }
 }
 
 const telas = {
   inicio: {
-    inicializa(){
+    inicializa() {
       globais.maviBird = criaMaviBird();
       globais.chao = criaChao();
+      globais.canos = criaCanos();
     },
     desenhar() {
       planoDeFundo.desenhar();
-      globais.chao.desenhar();
       globais.maviBird.desenhar();
-      mensagemGetReady.desenhar();
+      globais.canos.desenhar();
+      globais.chao.desenhar();
+      // mensagemGetReady.desenhar();
     },
-    click(){
+    click() {
       mudaParaTela(telas.jogo);
     },
     atualiza() {
       globais.chao.atualiza();
-    }
+      globais.canos.atualiza();
+    },
   },
 };
 
 telas.jogo = {
-    desenhar() {
-      planoDeFundo.desenhar();
-      globais.chao.desenhar();
-      globais.maviBird.desenhar();
-    },
-    click(){
-      globais.maviBird.pula();
-    },
-    atualiza() {
-      globais.maviBird.atualiza();
-    },
+  desenhar() {
+    planoDeFundo.desenhar();
+    globais.chao.desenhar();
+    globais.maviBird.desenhar();
+  },
+  click() {
+    globais.maviBird.pula();
+  },
+  atualiza() {
+    globais.maviBird.atualiza();
+  },
 };
 
 function loop() {
-
   telaAtiva.desenhar();
   telaAtiva.atualiza();
 
-  frames += 1; 
+  frames += 1;
   requestAnimationFrame(loop);
 }
 
-window.addEventListener('click', function() {
-  if(telaAtiva.click){
+window.addEventListener("click", function () {
+  if (telaAtiva.click) {
     telaAtiva.click();
   }
-})
+});
 
 mudaParaTela(telas.inicio);
 loop();
